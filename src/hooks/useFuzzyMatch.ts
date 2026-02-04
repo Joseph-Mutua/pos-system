@@ -1,7 +1,3 @@
-/**
- * Fuzzy match: query characters must appear in text in order (subsequence).
- * Case-insensitive. Used for fast client-side filtering.
- */
 export function fuzzyMatch(text: string, query: string): boolean {
   if (!query.trim()) return true;
   const lowerText = text.toLowerCase();

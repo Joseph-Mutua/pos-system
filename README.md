@@ -14,10 +14,8 @@ A **keyboard-first Point of Sale (POS)** interface for the bulk materials indust
 
 ## Design System
 
-The app uses the **same design system** as the parent uiux project:
-
 - **Colors**: `--accent-cyan`, `--accent-purple`, `--accent-green`, `--accent-orange`, `--text-primary`, `--text-secondary`, `--text-dim`, `--bg-deep`, `--bg-card`, etc.
-- **Typography**: Inter (sans), JetBrains Mono (mono).
+- **Typography**: Roboto (sans), JetBrains Mono (mono).
 - **Theming**: Light/dark mode via `data-theme="dark"` and CSS variables; theme toggle in the header.
 
 ## Tech Stack
@@ -34,7 +32,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173). Use a **desktop viewport (≥ 1000px)** and a **keyboard** for the intended experience.
+Open [http://localhost:5173](http://localhost:5173). Best with a **keyboard**; layout is **responsive** across viewports.
 
 ### Scripts
 
@@ -44,6 +42,7 @@ Open [http://localhost:5173](http://localhost:5173). Use a **desktop viewport (�
 | `npm run build`     | Production build to `dist/`    |
 | `npm run preview`   | Preview production build       |
 | `npm run typecheck` | Run TypeScript check (no emit) |
+| `npm run lint`      | Run ESLint                     |
 
 ## Project Structure
 
@@ -59,6 +58,8 @@ Challenge/
 │   │   └── ThemeToggle/
 │   ├── data/
 │   │   └── seed.ts         # Trucks, customers, orders, products (200 each)
+│   ├── lib/
+│   │   └── posFieldConfig.ts  # Field config, getFilteredOptions, findSelectedById
 │   ├── hooks/
 │   │   ├── useTheme.ts
 │   │   ├── useFuzzyMatch.ts
@@ -92,13 +93,14 @@ Challenge/
 | ⌘↵ / Ctrl+Enter | Print ticket (adds to recent) |
 | ⌘? / Ctrl+?     | Show hotkeys modal            |
 
+
 ## Coding Practices
 
 - **TypeScript**: Strict mode; explicit types for props and domain models.
 - **Accessibility**: ARIA roles (combobox, listbox, option), `aria-activedescendant`, focus management, keyboard support.
-- **Performance**: Fuzzy filter runs in-memory (O(n) per keystroke); list limited to 50 items; stable callbacks with `useCallback` where needed.
-- **Structure**: Small, focused components; shared design tokens in `index.css`; CSS Modules for encapsulation.
+- **Performance**: Memoized filtering (`useMemo`), stable callbacks (`useCallback`), `React.memo` on `ScaleDisplay` and `TransactionHistory`; fuzzy list capped at 50 items.
+- **Structure**: Small, focused components; shared field config in `src/lib/posFieldConfig.ts`; design tokens in `index.css`; CSS Modules for encapsulation; responsive layout.
 
 ---
 
-Built for the Fastweigh React + TypeScript Developer position.
+Built for Fastweigh

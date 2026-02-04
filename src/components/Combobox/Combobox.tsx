@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useEffect } from "react";
 import styles from "./Combobox.module.css";
 
 export interface ComboboxField {
@@ -57,8 +57,6 @@ export function Combobox({
   listboxId,
   inputId,
 }: ComboboxProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     if (isOpen && inputRef.current) {
       inputRef.current.focus();
@@ -77,7 +75,7 @@ export function Combobox({
 
   if (isOpen) {
     return (
-      <div ref={containerRef} className={styles.fieldSearchMode}>
+      <div className={styles.fieldSearchMode}>
         <div className={styles.searchHeader}>
           <span className={styles.searchLabel}>{label}</span>
           <span className={styles.shortcut}>{shortcut}</span>

@@ -4,7 +4,7 @@ const THEME_KEY = "pos-challenge-theme";
 type Theme = "light" | "dark";
 
 function getInitialTheme(): Theme {
-  if (typeof document === "undefined") return "light";
+  if (typeof document === "undefined") return "dark";
   const stored = localStorage.getItem(THEME_KEY) as Theme | null;
   if (stored === "dark" || stored === "light") return stored;
   return window.matchMedia("(prefers-color-scheme: dark)").matches

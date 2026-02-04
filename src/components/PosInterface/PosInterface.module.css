@@ -380,6 +380,17 @@
   outline-offset: 3px;
 }
 
+.printBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.printBtn:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
 [data-theme="dark"] .printBtn:hover {
   box-shadow: 0 6px 24px rgba(0, 212, 255, 0.35);
 }

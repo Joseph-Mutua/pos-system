@@ -1,134 +1,24 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { trucks, customers, orders, productsList } from "../../data/seed";
 import type { Truck, Customer, Order, Product, FieldType } from "../../types";
 import type { TransactionRecord } from "../../types";
-import { fuzzyMatchFields } from "../../hooks/useFuzzyMatch";
 import { roundToIncrement } from "../../utils/weight";
 import { useKeyboardShortcut } from "../../hooks/useKeyboardShortcut";
-import { Combobox, type ComboboxItem } from "../Combobox";
+import {
+  FIELD_CONFIGS,
+  getFilteredOptions,
+  findSelectedById,
+} from "../../lib/posFieldConfig";
+import { Combobox } from "../Combobox";
 import { ScaleDisplay } from "../ScaleDisplay";
 import { TransactionHistory } from "../TransactionHistory";
 import { HotkeysModal } from "../HotkeysModal";
 import styles from "./PosInterface.module.css";
 
-const FIELD_CONFIGS: { key: FieldType; label: string; shortcut: string }[] = [
-  { key: "truck", label: "Truck", shortcut: "⌘K" },
-  { key: "customer", label: "Customer", shortcut: "⌘J" },
-  { key: "order", label: "Order", shortcut: "⌘O" },
-  { key: "product", label: "Product", shortcut: "⌘P" },
-];
-
-function getFilteredItems(field: FieldType, query: string): ComboboxItem[] {
-  const q = query.trim().toLowerCase();
-  const limit = 50;
-
-  switch (field) {
-    case "truck":
-      return trucks
-        .filter((t) =>
-          fuzzyMatchFields(
-            [t.id, t.license, t.driver, t.carrier, t.truckType, t.phone],
-            q
-          )
-        )
-        .slice(0, limit)
-        .map((t) => ({
-          id: t.id,
-          fields: [
-            { label: "ID", value: t.id, mono: true },
-            { label: "License", value: t.license, mono: true },
-            { label: "Driver", value: t.driver },
-            { label: "Type", value: t.truckType },
-            { label: "Carrier", value: t.carrier },
-            {
-              label: "Tare",
-              value: `${(t.lastTare / 1000).toFixed(1)}k`,
-              mono: true,
-            },
-          ],
-        }));
-    case "customer":
-      return customers
-        .filter((c) =>
-          fuzzyMatchFields(
-            [c.name, c.id, c.city, c.state, c.phone, c.paymentTerms],
-            q
-          )
-        )
-        .slice(0, limit)
-        .map((c) => ({
-          id: c.id,
-          fields: [
-            { label: "Name", value: c.name },
-            { label: "ID", value: c.id, mono: true },
-            { label: "Location", value: `${c.city}, ${c.state}` },
-            { label: "Status", value: c.status },
-            { label: "Terms", value: c.paymentTerms },
-            {
-              label: "Credit",
-              value:
-                c.creditRemaining > 0
-                  ? `$${(c.creditRemaining / 1000).toFixed(0)}k`
-                  : "—",
-              mono: true,
-            },
-          ],
-        }));
-    case "order":
-      return orders
-        .filter((o) =>
-          fuzzyMatchFields(
-            [
-              o.id,
-              o.poNumber,
-              o.description,
-              o.customerName,
-              o.jobSite,
-              o.jobType,
-            ],
-            q
-          )
-        )
-        .slice(0, limit)
-        .map((o) => ({
-          id: o.id,
-          fields: [
-            { label: "Order", value: o.id, mono: true },
-            { label: "PO", value: o.poNumber, mono: true },
-            { label: "Project", value: o.description },
-            { label: "Customer", value: o.customerName },
-            { label: "Job Site", value: o.jobSite },
-            {
-              label: "Remaining",
-              value: `${o.remainingQty.toLocaleString()}T`,
-              mono: true,
-            },
-          ],
-        }));
-    case "product":
-      return productsList
-        .filter((p) =>
-          fuzzyMatchFields(
-            [p.name, p.id, p.dotCode, p.category, p.stockpile, p.taxCode],
-            q
-          )
-        )
-        .slice(0, limit)
-        .map((p) => ({
-          id: p.id,
-          fields: [
-            { label: "Product", value: p.name },
-            { label: "ID", value: p.id, mono: true },
-            { label: "DOT", value: p.dotCode, mono: true },
-            { label: "Category", value: p.category },
-            { label: "Stockpile", value: p.stockpile },
-            { label: "Price", value: `$${p.price.toFixed(2)}/T`, mono: true },
-          ],
-        }));
-    default:
-      return [];
-  }
-}
+const EMPTY_ITEMS: {
+  id: string;
+  fields: { label: string; value: string; mono?: boolean }[];
+}[] = [];
 
 export function PosInterface() {
   const [weight, setWeight] = useState(78000);
@@ -165,7 +55,12 @@ export function PosInterface() {
   const netWeight = grossWeight - tareWeight;
   const price = selectedProduct?.price ?? 12.5;
 
-  // Scale simulation
+  const filteredItems = useMemo(
+    () =>
+      activeField ? getFilteredOptions(activeField, searchQuery) : EMPTY_ITEMS,
+    [activeField, searchQuery]
+  );
+
   useEffect(() => {
     const interval = setInterval(() => {
       if (Math.random() > 0.7) {
@@ -181,10 +76,6 @@ export function PosInterface() {
     }, 3000);
     return () => clearInterval(interval);
   }, []);
-
-  useEffect(() => {
-    setHighlightedIndex(0);
-  }, [searchQuery]);
 
   const openField = useCallback((field: FieldType) => {
     setActiveField(field);
@@ -215,22 +106,24 @@ export function PosInterface() {
 
   const selectItem = useCallback(
     (id: string) => {
-      if (activeField === "truck")
-        setSelectedTruck(trucks.find((t) => t.id === id) ?? null);
-      if (activeField === "customer")
-        setSelectedCustomer(customers.find((c) => c.id === id) ?? null);
-      if (activeField === "order")
-        setSelectedOrder(orders.find((o) => o.id === id) ?? null);
-      if (activeField === "product")
-        setSelectedProduct(productsList.find((p) => p.id === id) ?? null);
+      const field = activeField;
+      if (!field) return;
+      const entity = findSelectedById(field, id);
+      if (entity) {
+        if (field === "truck") setSelectedTruck(entity as Truck);
+        if (field === "customer") setSelectedCustomer(entity as Customer);
+        if (field === "order") setSelectedOrder(entity as Order);
+        if (field === "product") setSelectedProduct(entity as Product);
+      }
       closeField();
     },
     [activeField, closeField]
   );
 
-  const filteredItems = activeField
-    ? getFilteredItems(activeField, searchQuery)
-    : [];
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchQuery(value);
+    setHighlightedIndex(0);
+  }, []);
 
   const handleComboboxKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -262,7 +155,7 @@ export function PosInterface() {
     },
     [
       activeField,
-      searchQuery,
+      filteredItems,
       highlightedIndex,
       selectItem,
       closeField,
@@ -270,18 +163,21 @@ export function PosInterface() {
     ]
   );
 
-  const getFieldValue = (field: FieldType): string => {
-    switch (field) {
-      case "truck":
-        return selectedTruck?.id ?? "Select...";
-      case "customer":
-        return selectedCustomer?.name ?? "Select...";
-      case "order":
-        return selectedOrder?.id ?? "Select...";
-      case "product":
-        return selectedProduct?.name ?? "Select...";
-    }
-  };
+  const getFieldValue = useCallback(
+    (field: FieldType): string => {
+      switch (field) {
+        case "truck":
+          return selectedTruck?.id ?? "Select...";
+        case "customer":
+          return selectedCustomer?.name ?? "Select...";
+        case "order":
+          return selectedOrder?.id ?? "Select...";
+        case "product":
+          return selectedProduct?.name ?? "Select...";
+      }
+    },
+    [selectedTruck, selectedCustomer, selectedOrder, selectedProduct]
+  );
 
   type DetailItem = {
     label: string;
@@ -289,81 +185,84 @@ export function PosInterface() {
     status?: "good" | "warn" | "bad";
   };
 
-  const getFieldDetails = (field: FieldType): DetailItem[] | null => {
-    switch (field) {
-      case "truck":
-        if (!selectedTruck) return null;
-        return [
-          { label: "License", value: selectedTruck.license },
-          { label: "Driver", value: selectedTruck.driver },
-          { label: "Type", value: selectedTruck.truckType },
-          { label: "Carrier", value: selectedTruck.carrier },
-          {
-            label: "Tare",
-            value: `${(selectedTruck.lastTare / 1000).toFixed(1)}k`,
-          },
-          { label: "Loads", value: `${selectedTruck.loadsToday}` },
-        ];
-      case "customer":
-        if (!selectedCustomer) return null;
-        return [
-          { label: "ID", value: selectedCustomer.id },
-          {
-            label: "Location",
-            value: `${selectedCustomer.city}, ${selectedCustomer.state}`,
-          },
-          {
-            label: "Status",
-            value: selectedCustomer.status,
-            status:
-              selectedCustomer.status === "Active"
-                ? "good"
-                : selectedCustomer.status === "On Hold"
-                ? "warn"
-                : "bad",
-          },
-          { label: "Terms", value: selectedCustomer.paymentTerms },
-          {
-            label: "Credit",
-            value:
-              selectedCustomer.creditRemaining > 0
-                ? `$${(selectedCustomer.creditRemaining / 1000).toFixed(0)}k`
-                : "—",
-          },
-          {
-            label: "YTD",
-            value: `${(selectedCustomer.ytdTons / 1000).toFixed(1)}kT`,
-          },
-        ];
-      case "order":
-        if (!selectedOrder) return null;
-        return [
-          { label: "PO", value: selectedOrder.poNumber },
-          { label: "Project", value: selectedOrder.description },
-          { label: "Type", value: selectedOrder.jobType },
-          { label: "Site", value: selectedOrder.jobSite },
-          {
-            label: "Rem",
-            value: `${selectedOrder.remainingQty.toLocaleString()}T`,
-          },
-        ];
-      case "product":
-        if (!selectedProduct) return null;
-        return [
-          { label: "DOT", value: selectedProduct.dotCode },
-          { label: "Category", value: selectedProduct.category },
-          { label: "Stockpile", value: selectedProduct.stockpile },
-          { label: "Price", value: `$${selectedProduct.price.toFixed(2)}/T` },
-          {
-            label: "Stock",
-            value: `${selectedProduct.inStock.toLocaleString()}T`,
-          },
-          { label: "Tax", value: selectedProduct.taxCode },
-        ];
-      default:
-        return null;
-    }
-  };
+  const getFieldDetails = useCallback(
+    (field: FieldType): DetailItem[] | null => {
+      switch (field) {
+        case "truck":
+          if (!selectedTruck) return null;
+          return [
+            { label: "License", value: selectedTruck.license },
+            { label: "Driver", value: selectedTruck.driver },
+            { label: "Type", value: selectedTruck.truckType },
+            { label: "Carrier", value: selectedTruck.carrier },
+            {
+              label: "Tare",
+              value: `${(selectedTruck.lastTare / 1000).toFixed(1)}k`,
+            },
+            { label: "Loads", value: `${selectedTruck.loadsToday}` },
+          ];
+        case "customer":
+          if (!selectedCustomer) return null;
+          return [
+            { label: "ID", value: selectedCustomer.id },
+            {
+              label: "Location",
+              value: `${selectedCustomer.city}, ${selectedCustomer.state}`,
+            },
+            {
+              label: "Status",
+              value: selectedCustomer.status,
+              status:
+                selectedCustomer.status === "Active"
+                  ? "good"
+                  : selectedCustomer.status === "On Hold"
+                  ? "warn"
+                  : "bad",
+            },
+            { label: "Terms", value: selectedCustomer.paymentTerms },
+            {
+              label: "Credit",
+              value:
+                selectedCustomer.creditRemaining > 0
+                  ? `$${(selectedCustomer.creditRemaining / 1000).toFixed(0)}k`
+                  : "—",
+            },
+            {
+              label: "YTD",
+              value: `${(selectedCustomer.ytdTons / 1000).toFixed(1)}kT`,
+            },
+          ];
+        case "order":
+          if (!selectedOrder) return null;
+          return [
+            { label: "PO", value: selectedOrder.poNumber },
+            { label: "Project", value: selectedOrder.description },
+            { label: "Type", value: selectedOrder.jobType },
+            { label: "Site", value: selectedOrder.jobSite },
+            {
+              label: "Rem",
+              value: `${selectedOrder.remainingQty.toLocaleString()}T`,
+            },
+          ];
+        case "product":
+          if (!selectedProduct) return null;
+          return [
+            { label: "DOT", value: selectedProduct.dotCode },
+            { label: "Category", value: selectedProduct.category },
+            { label: "Stockpile", value: selectedProduct.stockpile },
+            { label: "Price", value: `$${selectedProduct.price.toFixed(2)}/T` },
+            {
+              label: "Stock",
+              value: `${selectedProduct.inStock.toLocaleString()}T`,
+            },
+            { label: "Tax", value: selectedProduct.taxCode },
+          ];
+        default:
+          return null;
+      }
+    },
+    [selectedTruck, selectedCustomer, selectedOrder, selectedProduct]
+  );
 
   const handleHistorySelect = useCallback((tx: TransactionRecord) => {
     setSelectedTruck(tx.truck);
@@ -371,18 +270,20 @@ export function PosInterface() {
   }, []);
 
   const handlePrintTicket = useCallback(() => {
-    if (!selectedTruck || !selectedCustomer) return;
+    if (!isStable || !selectedTruck || !selectedCustomer) return;
     setRecentTransactions((prev) => [
       { truck: selectedTruck, customer: selectedCustomer, weight: netWeight },
       ...prev.slice(0, 19),
     ]);
-  }, [selectedTruck, selectedCustomer, netWeight]);
+  }, [isStable, selectedTruck, selectedCustomer, netWeight]);
+
+  const closeHotkeys = useCallback(() => setHotkeysOpen(false), []);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        if (selectedTruck && selectedCustomer) {
+        if (isStable && selectedTruck && selectedCustomer) {
           setRecentTransactions((prev) => [
             {
               truck: selectedTruck,
@@ -396,7 +297,9 @@ export function PosInterface() {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [selectedTruck, selectedCustomer, netWeight]);
+  }, [isStable, selectedTruck, selectedCustomer, netWeight]);
+
+  const noop = useCallback(() => {}, []);
 
   return (
     <>
@@ -437,7 +340,7 @@ export function PosInterface() {
                       onOpen={() => openField(field.key)}
                       onClose={closeField}
                       searchQuery={searchQuery}
-                      onSearchChange={setSearchQuery}
+                      onSearchChange={handleSearchChange}
                       items={filteredItems}
                       highlightedIndex={highlightedIndex}
                       onHighlight={setHighlightedIndex}
@@ -459,12 +362,12 @@ export function PosInterface() {
                         onOpen={() => openField(field.key)}
                         onClose={closeField}
                         searchQuery=""
-                        onSearchChange={() => {}}
-                        items={[]}
+                        onSearchChange={noop}
+                        items={EMPTY_ITEMS}
                         highlightedIndex={0}
-                        onHighlight={() => {}}
-                        onSelect={() => {}}
-                        onKeyDown={() => {}}
+                        onHighlight={noop}
+                        onSelect={noop}
+                        onKeyDown={noop}
                         inputRef={inputRef}
                         listRef={listRef}
                         listboxId={`listbox-${field.key}`}
@@ -538,6 +441,9 @@ export function PosInterface() {
                   type="button"
                   className={styles.printBtn}
                   onClick={handlePrintTicket}
+                  disabled={!isStable}
+                  title={isStable ? undefined : "Wait for scale to be stable"}
+                  aria-disabled={!isStable}
                 >
                   Print Ticket
                   <span className={styles.btnShortcut}>⌘↵</span>
@@ -553,10 +459,7 @@ export function PosInterface() {
         </div>
       </div>
 
-      <HotkeysModal
-        isOpen={hotkeysOpen}
-        onClose={() => setHotkeysOpen(false)}
-      />
+      <HotkeysModal isOpen={hotkeysOpen} onClose={closeHotkeys} />
     </>
   );
 }

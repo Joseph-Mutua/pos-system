@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { TransactionRecord } from "../../types";
 import styles from "./TransactionHistory.module.css";
 
@@ -6,7 +7,7 @@ interface TransactionHistoryProps {
   onSelect: (tx: TransactionRecord) => void;
 }
 
-export function TransactionHistory({
+function TransactionHistoryBase({
   transactions,
   onSelect,
 }: TransactionHistoryProps) {
@@ -47,3 +48,5 @@ export function TransactionHistory({
     </div>
   );
 }
+
+export const TransactionHistory = memo(TransactionHistoryBase);

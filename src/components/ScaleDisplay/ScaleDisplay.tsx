@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { formatWeight } from "../../utils/weight";
 import styles from "./ScaleDisplay.module.css";
 
@@ -10,11 +11,7 @@ interface ScaleDisplayProps {
   isStable: boolean;
 }
 
-export function ScaleDisplay({
-  grossLbs,
-  tareLbs,
-  isStable,
-}: ScaleDisplayProps) {
+function ScaleDisplayBase({ grossLbs, tareLbs, isStable }: ScaleDisplayProps) {
   const gross = formatWeight(grossLbs);
   const tare = formatWeight(tareLbs);
   const netLbs = grossLbs - tareLbs;
@@ -85,3 +82,5 @@ export function ScaleDisplay({
     </div>
   );
 }
+
+export const ScaleDisplay = memo(ScaleDisplayBase);

@@ -10,9 +10,9 @@ export function useKeyboardShortcut(
 ): void {
   const enabled = options?.enabled ?? true;
   const handlerRef = useRef(handler);
-  handlerRef.current = handler;
 
   useEffect(() => {
+    handlerRef.current = handler;
     if (!enabled) return;
 
     const onKeyDown = (e: KeyboardEvent) => {
@@ -27,5 +27,5 @@ export function useKeyboardShortcut(
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [key, enabled]);
+  }, [key, enabled, handler]);
 }
