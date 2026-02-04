@@ -515,18 +515,23 @@ export function PosInterface() {
             </div>
 
             <div className={styles.bottomSection}>
-              <ScaleDisplay
-                grossLbs={grossWeight}
-                tareLbs={tareWeight}
-                isStable={isStable}
-              />
-              <div className={styles.totals}>
-                <div className={styles.totalItem}>
-                  <span className={styles.totalLabel}>
+              <div className={styles.bottomSectionScale}>
+                <ScaleDisplay
+                  grossLbs={grossWeight}
+                  tareLbs={tareWeight}
+                  isStable={isStable}
+                />
+              </div>
+              <div className={styles.bottomSectionActions}>
+                <div className={styles.totals}>
+                  <div className={styles.totalItem}>
+                    <span className={styles.totalLabel}>Total</span>
+                    <span className={styles.totalValue}>
+                      ${((netWeight / 2000) * price).toFixed(2)}
+                    </span>
+                  </div>
+                  <span className={styles.totalMeta}>
                     @ ${price.toFixed(2)}/ton
-                  </span>
-                  <span className={styles.totalValue}>
-                    ${((netWeight / 2000) * price).toFixed(2)}
                   </span>
                 </div>
                 <button
