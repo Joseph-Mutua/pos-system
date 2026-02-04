@@ -1,18 +1,22 @@
 .fieldSearchMode {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   position: relative;
+  width: 100%;
+  min-width: 0;
 }
 
 .searchHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .searchLabel {
-  font-size: clamp(0.65rem, 1.3vh, 0.8rem);
+  font-size: clamp(0.7rem, 2vw, 0.85rem);
   color: var(--accent-cyan);
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -21,22 +25,34 @@
 
 .shortcut {
   font-family: var(--font-mono);
-  font-size: clamp(0.5rem, 1vh, 0.65rem);
+  font-size: clamp(0.6rem, 1.8vw, 0.7rem);
   color: var(--text-dim);
   opacity: 0.6;
 }
 
 .searchInput {
   width: 100%;
-  padding: clamp(8px, 1.5vh, 12px) clamp(10px, 1.2vw, 14px);
+  min-width: 0;
+  padding: clamp(12px, 2vh, 16px) clamp(14px, 2.5vw, 18px);
+  min-height: 48px;
   background: rgba(0, 153, 204, 0.08);
   border: 1px solid var(--accent-cyan);
-  border-radius: 6px;
+  border-radius: 8px;
   box-shadow: 0 0 0 2px rgba(0, 153, 204, 0.1);
   font-family: var(--font-sans);
-  font-size: clamp(0.8rem, 1.6vh, 0.95rem);
+  font-size: clamp(1rem, 2.5vw, 1rem);
   color: var(--text-primary);
   outline: none;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (min-width: 640px) {
+  .searchInput {
+    min-height: 44px;
+    padding: clamp(10px, 1.8vh, 14px) clamp(12px, 1.5vw, 16px);
+    font-size: clamp(0.875rem, 1.6vh, 0.95rem);
+  }
 }
 
 [data-theme="dark"] .searchInput {
@@ -53,14 +69,25 @@
   top: 100%;
   left: 0;
   right: 0;
-  margin-top: 4px;
+  margin-top: 6px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  border-radius: 6px;
+  border-radius: 8px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-  max-height: min(280px, 35vh);
+  max-height: min(320px, 45vh, 55dvh);
   overflow-y: auto;
+  overflow-x: hidden;
   z-index: 100;
+}
+
+@media (min-width: 640px) {
+  .dropdown {
+    max-height: min(280px, 40vh, 50dvh);
+    margin-top: 4px;
+  }
 }
 
 [data-theme="dark"] .dropdown {
@@ -70,11 +97,19 @@
 .dropdownItem {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 16px;
-  padding: clamp(8px, 1.2vh, 12px) clamp(10px, 1vw, 14px);
+  gap: clamp(6px, 1.2vw, 10px) clamp(10px, 2vw, 16px);
+  padding: clamp(12px, 2vh, 14px) clamp(12px, 2vw, 16px);
+  min-height: 44px;
   cursor: pointer;
   transition: background 100ms ease;
   border-bottom: 1px solid var(--border-subtle);
+}
+
+@media (min-width: 640px) {
+  .dropdownItem {
+    padding: clamp(8px, 1.2vh, 12px) clamp(10px, 1vw, 14px);
+    min-height: 0;
+  }
 }
 
 .dropdownItem:last-child {
@@ -101,19 +136,46 @@
   display: flex;
   align-items: baseline;
   gap: 4px;
-  min-width: 80px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (min-width: 400px) {
+  .dropdownField {
+    min-width: 70px;
+  }
+}
+
+@media (min-width: 640px) {
+  .dropdownField {
+    min-width: 80px;
+  }
 }
 
 .dropdownFieldLabel {
-  font-size: clamp(0.5rem, 1.1vh, 0.65rem);
+  font-size: clamp(0.6rem, 1.8vw, 0.7rem);
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.02em;
+  flex-shrink: 0;
 }
 
 .dropdownFieldValue {
-  font-size: clamp(0.7rem, 1.4vh, 0.85rem);
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
   color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .dropdownFieldLabel {
+    font-size: clamp(0.5rem, 1.1vh, 0.65rem);
+  }
+  .dropdownFieldValue {
+    font-size: clamp(0.7rem, 1.4vh, 0.85rem);
+  }
 }
 
 .dropdownField.mono .dropdownFieldValue {
@@ -123,14 +185,17 @@
 .fieldInput {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
 }
 
 .fieldLabel {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: clamp(0.6rem, 1.2vh, 0.75rem);
+  gap: 8px;
+  font-size: clamp(0.65rem, 2vw, 0.8rem);
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -140,10 +205,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: clamp(8px, 1.2vh, 12px) clamp(10px, 1vw, 14px);
+  padding: clamp(12px, 2vh, 14px) clamp(14px, 2.5vw, 18px);
+  min-height: 48px;
   background: rgba(0, 0, 0, 0.02);
   border: 1px solid var(--border-subtle);
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 150ms ease;
   font-family: inherit;
@@ -151,6 +217,16 @@
   color: inherit;
   text-align: left;
   width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (min-width: 640px) {
+  .input {
+    min-height: 44px;
+    padding: clamp(10px, 1.5vh, 14px) clamp(12px, 1.5vw, 16px);
+  }
 }
 
 [data-theme="dark"] .input {
@@ -167,16 +243,30 @@
 }
 
 .inputValue {
-  font-size: clamp(0.8rem, 1.5vh, 0.95rem);
+  font-size: clamp(0.85rem, 2.2vw, 0.95rem);
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .inputValue {
+    font-size: clamp(0.8rem, 1.5vh, 0.95rem);
+  }
 }
 
 .input svg {
   color: var(--text-dim);
   flex-shrink: 0;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
+}
+
+@media (min-width: 640px) {
+  .input svg {
+    width: 12px;
+    height: 12px;
+  }
 }

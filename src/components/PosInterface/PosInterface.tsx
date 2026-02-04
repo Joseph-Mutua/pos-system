@@ -400,12 +400,6 @@ export function PosInterface() {
 
   return (
     <>
-      <div className={styles.mobileNotice}>
-        <p>
-          This POS is optimized for desktop. Use a keyboard and viewport ≥
-          1000px for the full experience.
-        </p>
-      </div>
       <div className={styles.mockup}>
         <header className={styles.header}>
           <div className={styles.headerLeft}>

@@ -6,7 +6,11 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 24px;
+  padding: max(clamp(16px, 4vw, 24px), env(safe-area-inset-top))
+    max(clamp(16px, 4vw, 24px), env(safe-area-inset-right))
+    max(clamp(16px, 4vw, 24px), env(safe-area-inset-bottom))
+    max(clamp(16px, 4vw, 24px), env(safe-area-inset-left));
+  overflow-y: auto;
 }
 
 .modal {
@@ -14,9 +18,11 @@
   border: 1px solid var(--border-subtle);
   border-radius: 10px;
   box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
-  max-width: 380px;
+  max-width: min(380px, 92vw);
   width: 100%;
-  overflow: hidden;
+  max-height: min(85vh, 85dvh);
+  overflow: auto;
+  margin: auto;
 }
 
 .header {

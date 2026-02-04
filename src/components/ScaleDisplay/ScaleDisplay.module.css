@@ -1,7 +1,9 @@
 .scaleCompact {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: clamp(12px, 2vw, 20px);
+  gap: clamp(8px, 1.5vw, 20px);
+  min-width: 0;
 }
 
 .scaleLabel {
@@ -19,6 +21,8 @@
   padding: 3px 6px;
   border-radius: 4px;
   letter-spacing: 0.03em;
+  transition: background-color 0.35s ease, color 0.35s ease,
+    box-shadow 0.35s ease;
 }
 
 .scaleStatus.stable {
@@ -33,27 +37,29 @@
 .scaleStatus.moving {
   background: rgba(234, 88, 12, 0.15);
   color: var(--accent-orange);
-  animation: blink 0.8s ease-in-out infinite;
+  animation: readingPulse 1.25s ease-in-out infinite;
 }
 
 [data-theme="dark"] .scaleStatus.moving {
   background: rgba(255, 149, 0, 0.2);
 }
 
-@keyframes blink {
+@keyframes readingPulse {
   0%,
   100% {
     opacity: 1;
   }
   50% {
-    opacity: 0.5;
+    opacity: 0.72;
   }
 }
 
 .weightDisplay {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
-  gap: clamp(12px, 2vw, 20px);
+  gap: clamp(8px, 1.5vw, 20px);
+  min-width: 0;
 }
 
 .weightGroup {
@@ -79,8 +85,10 @@
 
 .weightRow {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: clamp(6px, 1vw, 10px);
+  gap: clamp(4px, 0.8vw, 10px);
+  min-width: 0;
 }
 
 .weightItem {

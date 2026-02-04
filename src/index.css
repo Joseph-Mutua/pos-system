@@ -71,7 +71,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: var(--font-sans);
-  font-size: 16px;
+  font-size: clamp(15px, 2vw, 16px);
   line-height: 1.6;
   color: var(--text-primary);
   background-color: var(--bg-deep);
@@ -80,6 +80,8 @@ body {
   overflow-x: hidden;
   transition: background-color var(--transition-normal),
     color var(--transition-normal);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 #root {
