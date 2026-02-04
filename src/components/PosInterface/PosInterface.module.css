@@ -154,6 +154,10 @@
     align-items: center;
     flex: 1;
   }
+
+  .fieldRowActive {
+    grid-template-columns: 1fr;
+  }
 }
 
 .fieldDetails {
