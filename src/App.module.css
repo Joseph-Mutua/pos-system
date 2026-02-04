@@ -1,0 +1,24 @@
+.app {
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto 24px;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+}
