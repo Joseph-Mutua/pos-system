@@ -1,6 +1,6 @@
 # POS Challenge — Fastweigh
 
-A **keyboard-first Point of Sale (POS)** interface for the bulk materials industry, built with React and TypeScript. This project fulfills the [Fastweigh UI/UX Developer Challenge](https://github.com/fastweigh/uiux) requirements.
+A **keyboard-first Point of Sale (POS)** interface for the bulk materials industry, built with React and TypeScript. This project fulfills the Fastweigh UI/UX Developer Challenge requirements.
 
 ## Requirements Implemented
 
@@ -25,7 +25,7 @@ The app uses the **same design system** as the parent uiux project:
 - **React 19** + **TypeScript** (strict)
 - **Vite** for build and dev server
 - **CSS Modules** for component styles
-- No UI library; custom components only
+- Static seed data (no API)
 
 ## Getting Started
 
@@ -58,42 +58,39 @@ Challenge/
 │   │   ├── PosInterface/   # Main POS layout and state
 │   │   └── ThemeToggle/
 │   ├── data/
-│   │   └── seed.ts        # Trucks, customers, orders, products (200 each)
+│   │   └── seed.ts         # Trucks, customers, orders, products (200 each)
 │   ├── hooks/
 │   │   ├── useTheme.ts
 │   │   ├── useFuzzyMatch.ts
 │   │   └── useKeyboardShortcut.ts
 │   ├── types/
 │   ├── utils/
-│   │   └── weight.ts      # roundToIncrement, formatWeight
+│   │   └── weight.ts       # roundToIncrement, formatWeight
 │   ├── App.tsx
-│   ├── App.module.css
-│   ├── index.css          # Design system (variables, reset)
+│   ├── index.css           # Design system (variables, reset)
 │   └── main.tsx
 ├── public/
 ├── index.html
 ├── package.json
 ├── tsconfig.json
-├── tsconfig.app.json
-├── tsconfig.node.json
 ├── vite.config.ts
 └── README.md
 ```
 
 ## Keyboard Shortcuts
 
-| Shortcut        | Action                             |
-| --------------- | ---------------------------------- |
-| ⌘K / Ctrl+K     | Open Truck search                  |
-| ⌘J / Ctrl+J     | Open Customer search               |
-| ⌘O / Ctrl+O     | Open Order search                  |
-| ⌘P / Ctrl+P     | Open Product search                |
-| Tab             | Next field (when a search is open) |
-| ↑ / ↓           | Move highlight in list             |
-| Enter           | Select highlighted item            |
-| Esc             | Close search                       |
-| ⌘↵ / Ctrl+Enter | Print ticket (adds to recent)      |
-| ⌘? / Ctrl+?     | Show hotkeys modal                 |
+| Shortcut        | Action                        |
+| --------------- | ----------------------------- |
+| ⌘K / Ctrl+K     | Open Truck search             |
+| ⌘J / Ctrl+J     | Open Customer search          |
+| ⌘O / Ctrl+O     | Open Order search             |
+| ⌘P / Ctrl+P     | Open Product search           |
+| Tab             | Next field (when search open) |
+| ↑ / ↓           | Move highlight in list        |
+| Enter           | Select highlighted item       |
+| Esc             | Close search                  |
+| ⌘↵ / Ctrl+Enter | Print ticket (adds to recent) |
+| ⌘? / Ctrl+?     | Show hotkeys modal            |
 
 ## Coding Practices
 

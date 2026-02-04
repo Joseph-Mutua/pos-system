@@ -22,7 +22,7 @@
   --glow-purple: 0 0 20px rgba(124, 58, 237, 0.15);
   --glow-orange: 0 0 20px rgba(234, 88, 12, 0.2);
 
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+  --font-sans: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
   --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", monospace;
 

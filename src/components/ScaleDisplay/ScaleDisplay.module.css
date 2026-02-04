@@ -1,23 +1,23 @@
 .scaleCompact {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: clamp(12px, 2vw, 20px);
 }
 
 .scaleLabel {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-family: var(--font-mono);
-  font-size: 0.55rem;
+  font-size: clamp(0.6rem, 1.2vh, 0.75rem);
   letter-spacing: 0.08em;
   color: var(--text-dim);
 }
 
 .scaleStatus {
-  font-size: 0.5rem;
-  padding: 1px 4px;
-  border-radius: 2px;
+  font-size: clamp(0.5rem, 1vh, 0.65rem);
+  padding: 3px 6px;
+  border-radius: 4px;
   letter-spacing: 0.03em;
 }
 
@@ -53,24 +53,24 @@
 .weightDisplay {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: clamp(12px, 2vw, 20px);
 }
 
 .weightGroup {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .weightGroupSep {
   width: 1px;
-  height: 28px;
+  height: clamp(28px, 4vh, 36px);
   background: var(--border-subtle);
   align-self: center;
 }
 
 .weightUnit {
-  font-size: 0.5rem;
+  font-size: clamp(0.55rem, 1.1vh, 0.65rem);
   font-family: var(--font-mono);
   color: var(--text-dim);
   text-transform: uppercase;
@@ -80,18 +80,18 @@
 .weightRow {
   display: flex;
   align-items: baseline;
-  gap: 6px;
+  gap: clamp(6px, 1vw, 10px);
 }
 
 .weightItem {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1px;
+  gap: 2px;
 }
 
 .weightLabel {
-  font-size: 0.5rem;
+  font-size: clamp(0.5rem, 1vh, 0.65rem);
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.02em;
@@ -99,7 +99,7 @@
 
 .weightValue {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: clamp(0.8rem, 1.6vh, 0.95rem);
   color: var(--text-secondary);
 }
 
@@ -108,9 +108,9 @@
 }
 
 .weightDivider {
-  font-size: 0.7rem;
+  font-size: clamp(0.7rem, 1.3vh, 0.85rem);
   color: var(--text-dim);
-  margin: 0 1px;
+  margin: 0 2px;
   align-self: flex-end;
-  padding-bottom: 1px;
+  padding-bottom: 2px;
 }

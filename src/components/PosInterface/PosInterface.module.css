@@ -24,27 +24,25 @@
 }
 
 .mockup {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
   background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
   overflow: hidden;
   font-family: var(--font-sans);
-  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.15);
   transition: background-color var(--transition-normal),
     border-color var(--transition-normal);
-}
-
-[data-theme="dark"] .mockup {
-  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 12px;
+  padding: clamp(10px, 1.5vh, 16px) clamp(16px, 2vw, 24px);
   background: rgba(0, 0, 0, 0.02);
   border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
 }
 
 [data-theme="dark"] .header {
@@ -59,24 +57,24 @@
 
 .logo {
   font-family: var(--font-mono);
-  font-size: 0.6rem;
+  font-size: clamp(0.7rem, 1.4vh, 0.85rem);
   font-weight: 700;
   letter-spacing: 0.1em;
   color: var(--accent-cyan);
 }
 
 .headerTitle {
-  font-size: 0.7rem;
+  font-size: clamp(0.75rem, 1.4vh, 0.9rem);
   color: var(--text-secondary);
 }
 
 .hotkey {
   font-family: var(--font-mono);
-  font-size: 0.6rem;
+  font-size: clamp(0.6rem, 1.2vh, 0.75rem);
   color: var(--text-dim);
   background: rgba(0, 0, 0, 0.05);
-  padding: 2px 6px;
-  border-radius: 3px;
+  padding: 4px 8px;
+  border-radius: 4px;
   border: none;
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -98,29 +96,37 @@
 
 .body {
   display: grid;
-  grid-template-columns: 1fr 140px;
+  grid-template-columns: 1fr minmax(160px, 200px);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .mainPanel {
   display: flex;
   flex-direction: column;
-  padding: 10px 12px;
+  padding: 16px 20px;
   border-right: 1px solid var(--border-subtle);
+  min-height: 0;
 }
 
 .fieldsSection {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
   gap: 0;
 }
 
 .fieldRow {
   display: grid;
-  grid-template-columns: 140px 1fr;
-  gap: 12px;
+  grid-template-columns: 160px 1fr;
+  gap: 16px;
   align-items: center;
-  padding: 6px 0;
+  padding: clamp(10px, 2vh, 20px) 0;
   border-bottom: 1px solid var(--border-subtle);
+  flex: 1;
+  min-height: 0;
 }
 
 .fieldRow:last-child {
@@ -129,29 +135,31 @@
 
 .fieldRowActive {
   grid-template-columns: 1fr;
+  flex: 1;
 }
 
 .fieldDetails {
   display: flex;
-  gap: 16px;
+  gap: 20px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .detailItem {
   display: flex;
   align-items: baseline;
-  gap: 4px;
+  gap: 6px;
 }
 
 .detailLabel {
-  font-size: 0.55rem;
+  font-size: clamp(0.55rem, 1.2vh, 0.7rem);
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.02em;
 }
 
 .detailValue {
-  font-size: 0.7rem;
+  font-size: clamp(0.7rem, 1.4vh, 0.85rem);
   color: var(--text-secondary);
   white-space: nowrap;
   font-family: var(--font-mono);
@@ -176,12 +184,13 @@
 .searchHint {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.55rem;
+  gap: 8px;
+  font-size: clamp(0.55rem, 1.1vh, 0.7rem);
   color: var(--text-dim);
-  padding: 4px 0;
+  padding: 8px 0;
   margin-top: 4px;
   opacity: 0.7;
+  flex-shrink: 0;
 }
 
 .searchHint svg {
@@ -194,9 +203,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 8px;
-  padding-top: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
   border-top: 1px solid var(--border-subtle);
+  flex-shrink: 0;
 }
 
 .totals {
@@ -212,13 +222,13 @@
 }
 
 .totalLabel {
-  font-size: 0.55rem;
+  font-size: clamp(0.55rem, 1.1vh, 0.7rem);
   color: var(--text-dim);
 }
 
 .totalValue {
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-size: clamp(0.9rem, 2vh, 1.15rem);
   font-weight: 600;
   color: var(--accent-green);
 }
@@ -226,13 +236,13 @@
 .printBtn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
+  gap: 8px;
+  padding: clamp(8px, 1.5vh, 12px) clamp(14px, 2vw, 20px);
   background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   font-family: var(--font-sans);
-  font-size: 0.7rem;
+  font-size: clamp(0.75rem, 1.5vh, 0.9rem);
   font-weight: 600;
   color: #ffffff;
   cursor: pointer;

@@ -228,11 +228,13 @@ export function PosInterface() {
     [activeField, closeField]
   );
 
+  const filteredItems = activeField
+    ? getFilteredItems(activeField, searchQuery)
+    : [];
+
   const handleComboboxKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      const items = activeField
-        ? getFilteredItems(activeField, searchQuery)
-        : [];
+      const items = filteredItems;
       switch (e.key) {
         case "ArrowDown":
           e.preventDefault();
@@ -395,10 +397,6 @@ export function PosInterface() {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [selectedTruck, selectedCustomer, netWeight]);
-
-  const filteredItems = activeField
-    ? getFilteredItems(activeField, searchQuery)
-    : [];
 
   return (
     <>

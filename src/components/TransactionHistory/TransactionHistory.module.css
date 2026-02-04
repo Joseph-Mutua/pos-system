@@ -1,9 +1,10 @@
 .historyPanel {
   background: rgba(0, 0, 0, 0.02);
-  padding: 8px;
+  padding: clamp(10px, 1.5vh, 16px);
   display: flex;
   flex-direction: column;
-  font-size: 0.65rem;
+  min-height: 0;
+  font-size: clamp(0.65rem, 1.2vh, 0.8rem);
 }
 
 [data-theme="dark"] .historyPanel {
@@ -13,25 +14,27 @@
 .historyHeader {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.6rem;
+  gap: 6px;
+  font-size: clamp(0.65rem, 1.2vh, 0.8rem);
   font-weight: 500;
   color: var(--text-dim);
-  margin-bottom: 6px;
-  padding-bottom: 4px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
   border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
 }
 
 .historyHeader svg {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
 }
 
 .historyList {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
 }
 
@@ -39,11 +42,11 @@
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 6px;
-  padding: 4px 6px;
+  gap: 8px;
+  padding: clamp(6px, 1vh, 10px) clamp(8px, 1vw, 12px);
   background: rgba(0, 0, 0, 0.02);
   border: none;
-  border-radius: 3px;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 100ms ease;
   font-family: inherit;
@@ -67,12 +70,12 @@
 
 .historyTruck {
   font-family: var(--font-mono);
-  font-size: 0.6rem;
+  font-size: clamp(0.65rem, 1.2vh, 0.8rem);
   color: var(--text-primary);
 }
 
 .historyCustomer {
-  font-size: 0.55rem;
+  font-size: clamp(0.6rem, 1.1vh, 0.75rem);
   color: var(--text-dim);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -81,6 +84,6 @@
 
 .historyWeight {
   font-family: var(--font-mono);
-  font-size: 0.55rem;
+  font-size: clamp(0.6rem, 1.1vh, 0.75rem);
   color: var(--text-dim);
 }

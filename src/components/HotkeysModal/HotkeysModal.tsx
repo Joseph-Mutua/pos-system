@@ -11,6 +11,7 @@ const shortcuts = [
   { keys: "Enter", desc: "Select highlighted" },
   { keys: "Esc", desc: "Close search" },
   { keys: "⌘ ↵", desc: "Print ticket" },
+  { keys: "⌘ ?", desc: "Show this help" },
 ];
 
 interface HotkeysModalProps {
