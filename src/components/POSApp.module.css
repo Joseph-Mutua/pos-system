@@ -561,6 +561,7 @@
 
 .tableCell {
   padding: 10px 6px;
+  text-align: start;
 }
 
 .muted {
