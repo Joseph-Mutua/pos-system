@@ -1,5 +1,7 @@
 # Bulk POS
 
+**Live app:** [https://pos-system-three-omega.vercel.app/](https://pos-system-three-omega.vercel.app/)
+
 A keyboard-first point-of-sale and weigh ticket app for high-throughput truck processing. Built with React, TypeScript, and Vite.
 
 ## Features
