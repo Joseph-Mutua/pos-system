@@ -38,7 +38,7 @@ export default function POSApp() {
       const unstable = Math.random() > 0.72;
       setIsStable(!unstable);
 
-      setScaleWeight((prev) => {
+      setScaleWeight((prev: number) => {
         const jitter = unstable
           ? Math.floor(Math.random() * 800 - 400)
           : Math.floor(Math.random() * 60 - 30);
@@ -74,7 +74,7 @@ export default function POSApp() {
     setSelectedProduct(null);
     setGross(null);
     setTare(null);
-    setFocusSignal((prev) => ({ ...prev, truck: prev.truck + 1 }));
+    setFocusSignal((prev: Record<FocusableId, number>) => ({ ...prev, truck: prev.truck + 1 }));
   }, []);
 
   const completeTransaction = useCallback(() => {
@@ -93,9 +93,9 @@ export default function POSApp() {
     };
 
     if (online) {
-      setHistory((prev) => [record, ...prev]);
+      setHistory((prev: HistoryRecord[]) => [record, ...prev]);
     } else {
-      setOutbox((prev) => [record, ...prev]);
+      setOutbox((prev: HistoryRecord[]) => [record, ...prev]);
     }
     setGross(null);
     setTare(null);
@@ -227,7 +227,7 @@ export default function POSApp() {
       if (keyMap[lower]) {
         event.preventDefault();
         const field = keyMap[lower];
-        setFocusSignal((prev) => ({ ...prev, [field]: prev[field] + 1 }));
+        setFocusSignal((prev: Record<FocusableId, number>) => ({ ...prev, [field]: prev[field] + 1 }));
       }
 
       if (event.key === "Enter") {

@@ -64,10 +64,10 @@ export default function CommandPalette({
 
   const all = useMemo<PaletteEntity[]>(
     () => [
-      ...trucks.map((entity) => ({ kind: "TRUCK", entity })),
-      ...customers.map((entity) => ({ kind: "CUSTOMER", entity })),
-      ...orders.map((entity) => ({ kind: "ORDER", entity })),
-      ...products.map((entity) => ({ kind: "PRODUCT", entity })),
+      ...trucks.map((entity): PaletteEntity => ({ kind: "TRUCK", entity })),
+      ...customers.map((entity): PaletteEntity => ({ kind: "CUSTOMER", entity })),
+      ...orders.map((entity): PaletteEntity => ({ kind: "ORDER", entity })),
+      ...products.map((entity): PaletteEntity => ({ kind: "PRODUCT", entity })),
     ],
     [trucks, customers, orders, products],
   );

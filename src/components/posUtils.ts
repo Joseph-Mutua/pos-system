@@ -14,7 +14,7 @@ export function formatTime(timestamp: string) {
   return new Date(timestamp).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
-  });
+  } as Intl.DateTimeFormatOptions);
 }
 
 export function entityById(list: Entity[], id: string) {
