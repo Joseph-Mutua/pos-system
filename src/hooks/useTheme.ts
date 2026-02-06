@@ -1,28 +1,36 @@
 import { useEffect, useState } from "react";
 
-const THEME_KEY = "pos-challenge-theme";
-type Theme = "light" | "dark";
+export type Theme = "day" | "night";
 
-function getInitialTheme(): Theme {
-  if (typeof document === "undefined") return "dark";
-  const stored = localStorage.getItem(THEME_KEY) as Theme | null;
-  if (stored === "dark" || stored === "light") return stored;
+const storageKey = "pos-theme";
+
+const getPreferredTheme = () => {
+  if (typeof window === "undefined") return "day";
   return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
-}
+    ? "night"
+    : "day";
+};
 
-export function useTheme(): [Theme, () => void] {
-  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
+const getStoredTheme = () => {
+  if (typeof window === "undefined") return null;
+  const stored = window.localStorage.getItem(storageKey);
+  return stored === "day" || stored === "night" ? stored : null;
+};
+
+export function useTheme() {
+  const [theme, setTheme] = useState<Theme>(() => {
+    return getStoredTheme() ?? getPreferredTheme();
+  });
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem(THEME_KEY, theme);
+    if (typeof window === "undefined") return;
+    document.documentElement.dataset.theme = theme;
+    window.localStorage.setItem(storageKey, theme);
   }, [theme]);
 
-  const toggle = () => {
-    setThemeState((prev) => (prev === "light" ? "dark" : "light"));
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "day" ? "night" : "day"));
   };
 
-  return [theme, toggle];
+  return { theme, setTheme, toggleTheme };
 }

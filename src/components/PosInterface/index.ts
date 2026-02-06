@@ -1,1 +1,0 @@
-export { PosInterface } from "./PosInterface";

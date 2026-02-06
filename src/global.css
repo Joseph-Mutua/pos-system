@@ -1,0 +1,97 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Sora:wght@500;600;700&display=swap");
+
+:root {
+  color-scheme: light;
+  font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --app-bg: #f5f4f0;
+  --text-primary: #101218;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  --text-soft: #94a3b8;
+  --kicker: #7b6a52;
+  --surface-1: rgba(255, 255, 255, 0.92);
+  --surface-2: #ffffff;
+  --surface-3: #f8fafc;
+  --surface-inverse: #111827;
+  --border-subtle: rgba(15, 18, 26, 0.08);
+  --border-strong: #e2e8f0;
+  --shadow-1: 0 12px 30px rgba(15, 18, 26, 0.08);
+  --shadow-2: 0 20px 60px rgba(15, 18, 26, 0.08);
+  --text-on-inverse: #f8fafc;
+  --text-on-inverse-muted: rgba(248, 250, 252, 0.7);
+  --accent: #2563eb;
+  --accent-strong: #1d4ed8;
+  --accent-alt: #4338ca;
+  --accent-soft: rgba(37, 99, 235, 0.12);
+  --accent-veil: rgba(37, 99, 235, 0.08);
+  --accent-border: #bfdbfe;
+  --accent-shadow: rgba(37, 99, 235, 0.25);
+  --accent-alt-shadow: rgba(67, 56, 202, 0.25);
+  --success: #10b981;
+  --warning: #f59e0b;
+  --success-shadow: rgba(16, 185, 129, 0.25);
+  --chip-bg: #f1f5f9;
+  --chip-text: #64748b;
+  --key-bg: #0f172a;
+  --key-text: #e2e8f0;
+  --row-border: #eef2f7;
+}
+
+[data-theme="night"] {
+  color-scheme: dark;
+  --app-bg: #0b0f14;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5f5;
+  --text-muted: #94a3b8;
+  --text-soft: #64748b;
+  --kicker: #d7b08c;
+  --surface-1: rgba(17, 24, 39, 0.9);
+  --surface-2: #111827;
+  --surface-3: #0f172a;
+  --surface-inverse: #0b1324;
+  --border-subtle: rgba(148, 163, 184, 0.25);
+  --border-strong: rgba(148, 163, 184, 0.35);
+  --shadow-1: 0 12px 30px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 20px 60px rgba(0, 0, 0, 0.5);
+  --text-on-inverse: #e2e8f0;
+  --text-on-inverse-muted: rgba(226, 232, 240, 0.7);
+  --accent: #60a5fa;
+  --accent-strong: #93c5fd;
+  --accent-alt: #818cf8;
+  --accent-soft: rgba(96, 165, 250, 0.18);
+  --accent-veil: rgba(96, 165, 250, 0.12);
+  --accent-border: #3b82f6;
+  --accent-shadow: rgba(96, 165, 250, 0.3);
+  --accent-alt-shadow: rgba(129, 140, 248, 0.3);
+  --success: #34d399;
+  --warning: #fbbf24;
+  --success-shadow: rgba(52, 211, 153, 0.3);
+  --chip-bg: rgba(148, 163, 184, 0.2);
+  --chip-text: #e2e8f0;
+  --key-bg: #0b1220;
+  --key-text: #e2e8f0;
+  --row-border: rgba(148, 163, 184, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--app-bg);
+  color: var(--text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+button,
+input {
+  font-family: inherit;
+}

@@ -1,1 +1,0 @@
-export { HotkeysModal } from "./HotkeysModal";
