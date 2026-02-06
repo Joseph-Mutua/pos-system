@@ -1,14 +1,29 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  EMPTY_DISPLAY,
+  FOCUS_KEY_MAP,
+  HOTKEY_ITEMS,
+  INITIAL_FOCUS_SIGNAL,
+  RECENT_TRANSACTIONS_LIMIT,
+  SCALE_MIN_WEIGHT,
+  SCALE_UPDATE_INTERVAL_MS,
+  SYNC_OUTBOX_DELAY_MS,
+} from "../constants";
 import styles from "./POSApp.module.css";
 import ThemeToggle from "./ThemeToggle";
 import SearchField from "./SearchField";
-import CommandPalette from "./CommandPalette";
+import CommandPalette, { type PaletteEntity } from "./CommandPalette";
 import { customers, historySeed, orders, products, trucks } from "./posData";
 import type { Entity, FocusableId, HistoryRecord } from "./posTypes";
 import { entityById, formatTime, pounds } from "./posUtils";
 import { useTheme } from "../hooks/useTheme";
 
-const emptyValue = "\u2014";
+function isInputFocused(target: EventTarget | null): boolean {
+  if (!target || !(target instanceof HTMLElement)) return false;
+  const tag = target.tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA") return true;
+  return target.getAttribute("contenteditable") === "true";
+}
 
 export default function POSApp() {
   const { theme, toggleTheme } = useTheme();
@@ -26,25 +41,20 @@ export default function POSApp() {
 
   const [scaleWeight, setScaleWeight] = useState(64000);
   const [isStable, setIsStable] = useState(true);
-  const [focusSignal, setFocusSignal] = useState<Record<FocusableId, number>>({
-    truck: 0,
-    customer: 0,
-    order: 0,
-    product: 0,
-  });
+  const [focusSignal, setFocusSignal] = useState<Record<FocusableId, number>>(INITIAL_FOCUS_SIGNAL);
 
   useEffect(() => {
     const interval = setInterval(() => {
       const unstable = Math.random() > 0.72;
       setIsStable(!unstable);
 
-      setScaleWeight((prev: number) => {
+      setScaleWeight((prev) => {
         const jitter = unstable
           ? Math.floor(Math.random() * 800 - 400)
           : Math.floor(Math.random() * 60 - 30);
-        return Math.max(5000, prev + jitter);
+        return Math.max(SCALE_MIN_WEIGHT, prev + jitter);
       });
-    }, 700);
+    }, SCALE_UPDATE_INTERVAL_MS);
 
     return () => clearInterval(interval);
   }, []);
@@ -67,6 +77,10 @@ export default function POSApp() {
     net &&
     net > 0;
 
+  const closePalette = useCallback(() => setPaletteOpen(false), []);
+  const openHotkeys = useCallback(() => setHotkeysOpen(true), []);
+  const closeHotkeys = useCallback(() => setHotkeysOpen(false), []);
+
   const resetTicket = useCallback(() => {
     setSelectedTruck(null);
     setSelectedCustomer(null);
@@ -74,7 +88,7 @@ export default function POSApp() {
     setSelectedProduct(null);
     setGross(null);
     setTare(null);
-    setFocusSignal((prev: Record<FocusableId, number>) => ({ ...prev, truck: prev.truck + 1 }));
+    setFocusSignal((prev) => ({ ...prev, truck: prev.truck + 1 }));
   }, []);
 
   const completeTransaction = useCallback(() => {
@@ -133,13 +147,21 @@ export default function POSApp() {
     setSelectedProduct(entityById(products, last.productId) ?? null);
   }, [history, outbox]);
 
+  const handlePalettePick = useCallback((ent: PaletteEntity) => {
+    if (ent.kind === "TRUCK") setSelectedTruck(ent.entity);
+    if (ent.kind === "CUSTOMER") setSelectedCustomer(ent.entity);
+    if (ent.kind === "ORDER") setSelectedOrder(ent.entity);
+    if (ent.kind === "PRODUCT") setSelectedProduct(ent.entity);
+  }, []);
+
+  const recentTransactions = useMemo(
+    () => [...outbox, ...history].slice(0, RECENT_TRANSACTIONS_LIMIT),
+    [outbox, history],
+  );
+
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      const target = event.target as HTMLElement | null;
-      const isTyping =
-        target?.tagName === "INPUT" ||
-        target?.tagName === "TEXTAREA" ||
-        (target as any)?.isContentEditable;
+      const isTyping = isInputFocused(event.target);
       const lower = event.key.toLowerCase();
 
       if ((event.ctrlKey || event.metaKey) && lower === "k") {
@@ -217,17 +239,10 @@ export default function POSApp() {
         return;
       }
 
-      const keyMap: Record<string, FocusableId> = {
-        t: "truck",
-        c: "customer",
-        o: "order",
-        p: "product",
-      };
-
-      if (keyMap[lower]) {
+      const focusId = FOCUS_KEY_MAP[lower];
+      if (focusId) {
         event.preventDefault();
-        const field = keyMap[lower];
-        setFocusSignal((prev: Record<FocusableId, number>) => ({ ...prev, [field]: prev[field] + 1 }));
+        setFocusSignal((prev) => ({ ...prev, [focusId]: prev[focusId] + 1 }));
       }
 
       if (event.key === "Enter") {
@@ -254,7 +269,7 @@ export default function POSApp() {
     const syncTimer = window.setTimeout(() => {
       setHistory((prev) => [...outbox, ...prev]);
       setOutbox([]);
-    }, 700);
+    }, SYNC_OUTBOX_DELAY_MS);
 
     return () => window.clearTimeout(syncTimer);
   }, [online, outbox]);
@@ -277,7 +292,8 @@ export default function POSApp() {
                 <button
                   type="button"
                   className={styles.hotkeysButton}
-                  onClick={() => setHotkeysOpen(true)}
+                  onClick={openHotkeys}
+                  aria-label="Show keyboard shortcuts"
                 >
                   <span className={styles.hotkeysIcon}>?</span>
                   Hotkeys
@@ -415,16 +431,16 @@ export default function POSApp() {
             <div className={styles.mathList}>
               <div className={styles.mathRow}>
                 <span>Gross</span>
-                <strong>{gross == null ? emptyValue : pounds(gross)}</strong>
+                <strong>{gross == null ? EMPTY_DISPLAY : pounds(gross)}</strong>
               </div>
               <div className={styles.mathRow}>
                 <span>Tare</span>
-                <strong>{tare == null ? emptyValue : pounds(tare)}</strong>
+                <strong>{tare == null ? EMPTY_DISPLAY : pounds(tare)}</strong>
               </div>
               <div className={`${styles.mathRow} ${styles.netRow}`}>
                 <span>Net</span>
                 <span className={styles.netValue}>
-                  {net == null ? emptyValue : pounds(net)}
+                  {net == null ? EMPTY_DISPLAY : pounds(net)}
                 </span>
               </div>
             </div>
@@ -479,17 +495,17 @@ export default function POSApp() {
           <table className={styles.table}>
             <thead className={styles.tableHead}>
               <tr>
-                <th className={styles.tableCell}>Ticket</th>
-                <th className={styles.tableCell}>Truck</th>
-                <th className={styles.tableCell}>Customer</th>
-                <th className={styles.tableCell}>Order</th>
-                <th className={styles.tableCell}>Product</th>
-                <th className={styles.tableCell}>Net</th>
-                <th className={styles.tableCell}>Time</th>
+                <th className={styles.tableCell} scope="col">Ticket</th>
+                <th className={styles.tableCell} scope="col">Truck</th>
+                <th className={styles.tableCell} scope="col">Customer</th>
+                <th className={styles.tableCell} scope="col">Order</th>
+                <th className={styles.tableCell} scope="col">Product</th>
+                <th className={styles.tableCell} scope="col">Net</th>
+                <th className={styles.tableCell} scope="col">Time</th>
               </tr>
             </thead>
             <tbody>
-              {[...outbox, ...history].slice(0, 10).map((row) => (
+              {recentTransactions.map((row) => (
                 <tr key={row.id} className={styles.tableRow}>
                   <td className={styles.tableCell}>
                     <strong>{row.id}</strong>
@@ -517,28 +533,31 @@ export default function POSApp() {
 
       <CommandPalette
         open={paletteOpen}
-        onClose={() => setPaletteOpen(false)}
+        onClose={closePalette}
         trucks={trucks}
         customers={customers}
         orders={orders}
         products={products}
-        onPick={(ent) => {
-          if (ent.kind === "TRUCK") setSelectedTruck(ent.entity);
-          if (ent.kind === "CUSTOMER") setSelectedCustomer(ent.entity);
-          if (ent.kind === "ORDER") setSelectedOrder(ent.entity);
-          if (ent.kind === "PRODUCT") setSelectedProduct(ent.entity);
-        }}
+        onPick={handlePalettePick}
       />
 
       {hotkeysOpen && (
-        <div className={styles.overlay} onMouseDown={() => setHotkeysOpen(false)}>
+        <div
+          className={styles.overlay}
+          onMouseDown={closeHotkeys}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="hotkeys-title"
+        >
           <div
             className={styles.hotkeysModal}
-            onMouseDown={(event) => event.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
           >
             <div className={styles.hotkeysHeader}>
               <div>
-                <div className={styles.hotkeysTitle}>Keyboard Commands</div>
+                <div id="hotkeys-title" className={styles.hotkeysTitle}>
+                  Keyboard Commands
+                </div>
                 <div className={styles.hotkeysHint}>
                   Click outside or press Esc to close.
                 </div>
@@ -546,27 +565,14 @@ export default function POSApp() {
               <button
                 type="button"
                 className={styles.hotkeysClose}
-                onClick={() => setHotkeysOpen(false)}
+                onClick={closeHotkeys}
+                aria-label="Close keyboard shortcuts"
               >
                 Close
               </button>
             </div>
             <div className={styles.hotkeysBody}>
-              {[
-                { key: "⌘+K", label: "Open command palette" },
-                { key: "N", label: "New ticket" },
-                { key: "⌘+T", label: "Focus truck search" },
-                { key: "⌘+C", label: "Focus customer search" },
-                { key: "⌘+O", label: "Focus order search" },
-                { key: "⌘+P", label: "Focus product search" },
-                { key: "F2 / G", label: "Capture gross weight" },
-                { key: "F3 / T", label: "Capture tare weight" },
-                { key: "F / ⌘+Enter", label: "Finalize ticket" },
-                { key: "R", label: "Repeat last ticket" },
-                { key: "P", label: "Repeat product" },
-                { key: "O", label: "Toggle online mode" },
-                { key: "⌘+Backspace", label: "Clear active search" },
-              ].map((item) => (
+              {HOTKEY_ITEMS.map((item) => (
                 <div key={item.key} className={styles.hotkeysItem}>
                   <div className={styles.hotkeysKey}>{item.key}</div>
                   <div>{item.label}</div>

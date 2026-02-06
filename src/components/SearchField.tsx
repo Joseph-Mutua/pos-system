@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { SEARCH_FIELD_MATCH_LIMIT } from "../constants";
 import styles from "./POSApp.module.css";
 import type { Entity, FocusableId } from "./posTypes";
-import { toDisplay } from "./posUtils";
+import { buildEntityHaystack, fuzzyScore, toDisplay } from "./posUtils";
 
 type SearchFieldProps = {
   id: FocusableId;
@@ -13,38 +14,6 @@ type SearchFieldProps = {
   hotkey: string;
   requestFocusSignal: number;
 };
-
-function fuzzyScore(query: string, entity: Entity) {
-  const normalized = query.trim().toLowerCase();
-  if (!normalized) return 1;
-
-  const haystack = [
-    entity.id,
-    entity.code,
-    entity.name,
-    ...(entity.aliases ?? []),
-  ]
-    .join(" ")
-    .toLowerCase();
-
-  if (haystack.startsWith(normalized)) return 120;
-  if (haystack.includes(normalized)) return 90;
-
-  let qIndex = 0;
-  let score = 0;
-
-  for (let i = 0; i < haystack.length && qIndex < normalized.length; i += 1) {
-    if (haystack[i] === normalized[qIndex]) {
-      qIndex += 1;
-      score += 3;
-    }
-  }
-
-  if (qIndex !== normalized.length) return 0;
-
-  score += Math.max(0, 40 - (haystack.length - normalized.length));
-  return score;
-}
 
 function renderHighlight(text: string, query: string) {
   const normalized = query.trim().toLowerCase();
@@ -63,7 +32,7 @@ function renderHighlight(text: string, query: string) {
   );
 }
 
-export default function SearchField({
+function SearchField({
   id,
   label,
   placeholder,
@@ -80,10 +49,10 @@ export default function SearchField({
 
   const filtered = useMemo(() => {
     const scored = options
-      .map((item) => ({ item, score: fuzzyScore(query, item) }))
+      .map((item) => ({ item, score: fuzzyScore(query, buildEntityHaystack(item)) }))
       .filter(({ score }) => score > 0)
       .sort((a, b) => b.score - a.score)
-      .slice(0, 20);
+      .slice(0, SEARCH_FIELD_MATCH_LIMIT);
     return scored.map(({ item }) => item);
   }, [options, query]);
 
@@ -97,11 +66,17 @@ export default function SearchField({
     inputRef.current?.select();
   }, [requestFocusSignal]);
 
-  const handleSelect = (item: Entity | null) => {
-    onSelect(item);
-    setQuery("");
-    setOpen(false);
-  };
+  const handleSelect = useCallback(
+    (item: Entity | null) => {
+      onSelect(item);
+      setQuery("");
+      setOpen(false);
+    },
+    [onSelect],
+  );
+
+  const dropdownId = `${id}-listbox`;
+  const activeOptionId = filtered.length ? `${id}-option-${activeIndex}` : undefined;
 
   return (
     <div className={styles.card}>
@@ -120,6 +95,11 @@ export default function SearchField({
           }}
           onFocus={() => setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 120)}
+          aria-autocomplete="list"
+          aria-expanded={open}
+          aria-controls={dropdownId}
+          aria-activedescendant={activeOptionId}
+          aria-label={label}
           onKeyDown={(e) => {
             if (
               (e.ctrlKey || e.metaKey) &&
@@ -160,16 +140,22 @@ export default function SearchField({
           }}
           className={styles.fieldInput}
           placeholder={placeholder}
-          aria-autocomplete="list"
-          aria-expanded={open}
         />
         {open && (
-          <div className={styles.dropdown}>
+          <div
+            id={dropdownId}
+            className={styles.dropdown}
+            role="listbox"
+            aria-label={`${label} suggestions`}
+          >
             {filtered.length ? (
               filtered.map((item, index) => (
                 <button
                   key={item.id}
+                  id={`${id}-option-${index}`}
                   type="button"
+                  role="option"
+                  aria-selected={index === activeIndex}
                   onMouseDown={(e) => {
                     e.preventDefault();
                     handleSelect(item);
@@ -188,7 +174,11 @@ export default function SearchField({
           </div>
         )}
       </div>
-      <p className={styles.fieldMeta}>Selected: {toDisplay(selected)}</p>
+      <p className={styles.fieldMeta} aria-live="polite">
+        Selected: {toDisplay(selected)}
+      </p>
     </div>
   );
 }
+
+export default memo(SearchField);

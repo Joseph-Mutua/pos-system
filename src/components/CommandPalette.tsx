@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { COMMAND_PALETTE_MATCH_LIMIT } from "../constants";
 import styles from "./POSApp.module.css";
 import type { Entity } from "./posTypes";
+import { buildPaletteEntryHaystack, fuzzyScore } from "./posUtils";
 
-type PaletteEntity =
+export type PaletteEntity =
   | { kind: "TRUCK"; entity: Entity }
   | { kind: "CUSTOMER"; entity: Entity }
   | { kind: "ORDER"; entity: Entity }
@@ -18,38 +20,11 @@ type CommandPaletteProps = {
   onPick: (entry: PaletteEntity) => void;
 };
 
-const scoreEntity = (query: string, entry: PaletteEntity) => {
-  const normalized = query.trim().toLowerCase();
-  if (!normalized) return 1;
+function scorePaletteEntry(query: string, entry: PaletteEntity): number {
+  return fuzzyScore(query, buildPaletteEntryHaystack(entry.kind, entry.entity));
+}
 
-  const haystack = [
-    entry.kind,
-    entry.entity.id,
-    entry.entity.code,
-    entry.entity.name,
-    ...(entry.entity.aliases ?? []),
-  ]
-    .join(" ")
-    .toLowerCase();
-
-  if (haystack.startsWith(normalized)) return 120;
-  if (haystack.includes(normalized)) return 90;
-
-  let qIndex = 0;
-  let score = 0;
-  for (let i = 0; i < haystack.length && qIndex < normalized.length; i += 1) {
-    if (haystack[i] === normalized[qIndex]) {
-      qIndex += 1;
-      score += 3;
-    }
-  }
-
-  if (qIndex !== normalized.length) return 0;
-  score += Math.max(0, 40 - (haystack.length - normalized.length));
-  return score;
-};
-
-export default function CommandPalette({
+function CommandPalette({
   open,
   onClose,
   trucks,
@@ -74,10 +49,10 @@ export default function CommandPalette({
 
   const matches = useMemo(() => {
     const scored = all
-      .map((item) => ({ item, score: scoreEntity(query, item) }))
+      .map((item) => ({ item, score: scorePaletteEntry(query, item) }))
       .filter(({ score }) => score > 0)
       .sort((a, b) => b.score - a.score)
-      .slice(0, 40);
+      .slice(0, COMMAND_PALETTE_MATCH_LIMIT);
     return scored.map(({ item }) => item);
   }, [all, query]);
 
@@ -93,11 +68,20 @@ export default function CommandPalette({
 
   if (!open) return null;
 
+  const listboxId = "command-palette-listbox";
+  const activeOptionId = matches.length ? `command-palette-option-${active}` : undefined;
+
   return (
-    <div className={styles.overlay} onMouseDown={onClose}>
+    <div
+      className={styles.overlay}
+      onMouseDown={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Search anything"
+    >
       <div
         className={styles.palette}
-        onMouseDown={(event) => event.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
       >
         <div className={styles.paletteHeader}>
           <div>
@@ -110,6 +94,7 @@ export default function CommandPalette({
             type="button"
             className={styles.paletteClose}
             onClick={onClose}
+            aria-label="Close command palette"
           >
             Close
           </button>
@@ -120,10 +105,15 @@ export default function CommandPalette({
             ref={inputRef}
             className={styles.paletteInput}
             value={query}
-            onChange={(event) => {
-              setQuery(event.target.value);
+            onChange={(e) => {
+              setQuery(e.target.value);
               setActive(0);
             }}
+            aria-autocomplete="list"
+            aria-controls={listboxId}
+            aria-activedescendant={activeOptionId}
+            aria-label="Search trucks, customers, orders, products"
+            placeholder="Truck, customer, order, product..."
             onKeyDown={(event) => {
               if (event.key === "Escape") {
                 event.preventDefault();
@@ -148,21 +138,28 @@ export default function CommandPalette({
                 }
               }
             }}
-            placeholder="Truck, customer, order, product..."
           />
 
-          <div className={styles.paletteResults} role="listbox">
+          <div
+            id={listboxId}
+            className={styles.paletteResults}
+            role="listbox"
+            aria-label="Search results"
+          >
             {matches.length ? (
               matches.map((item, index) => (
                 <button
                   key={`${item.kind}-${item.entity.id}`}
+                  id={index === active ? activeOptionId : undefined}
                   type="button"
+                  role="option"
+                  aria-selected={index === active}
                   className={`${styles.paletteItem} ${
                     index === active ? styles.paletteItemActive : ""
                   }`}
                   onMouseEnter={() => setActive(index)}
-                  onMouseDown={(event) => {
-                    event.preventDefault();
+                  onMouseDown={(e) => {
+                    e.preventDefault();
                     onPick(item);
                     onClose();
                   }}
@@ -200,3 +197,5 @@ export default function CommandPalette({
     </div>
   );
 }
+
+export default memo(CommandPalette);

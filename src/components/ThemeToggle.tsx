@@ -1,3 +1,4 @@
+import { memo } from "react";
 import styles from "./POSApp.module.css";
 import type { Theme } from "../hooks/useTheme";
 
@@ -6,7 +7,7 @@ type ThemeToggleProps = {
   onToggle: () => void;
 };
 
-export default function ThemeToggle({ theme, onToggle }: ThemeToggleProps) {
+function ThemeToggle({ theme, onToggle }: ThemeToggleProps) {
   const isNight = theme === "night";
   return (
     <button
@@ -47,3 +48,5 @@ export default function ThemeToggle({ theme, onToggle }: ThemeToggleProps) {
     </button>
   );
 }
+
+export default memo(ThemeToggle);
